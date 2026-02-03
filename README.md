@@ -2,7 +2,7 @@
 
 **Version:** 1.4.0  
 **Author:** Noah Farshad (noah@essential.coach)  
-**License:** MIT
+**License:** GPL v3
 
 A standalone "Swiss Army knife" tool for managing VMware Aria Automation infrastructure configuration. Handles everything needed to go from zero to VM-deployment-ready.
 
@@ -249,4 +249,4 @@ python3 aria_mapping.py --config config.yaml --storage --execute --verbose
 
 ## License
 
-MIT License - Copyright (C) 2026 Noah Farshad
+GPL v3 License - Copyright (C) 2026 Noah Farshad

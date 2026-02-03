@@ -10,7 +10,7 @@ A standalone, portable tool for managing VMware Aria Automation infrastructure:
   - Storage profiles (create and tag)
   - Capability tags (cloud zones, network profiles, compute clusters)
 
-License: MIT
+License: GPL v3
 Author: Noah Farshad (noah@essential.coach)
 
 ===============================================================================
