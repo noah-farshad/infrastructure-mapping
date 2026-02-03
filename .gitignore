@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.swp
+
+# Don't commit actual configs with credentials
+configs/*.yaml
+!configs/*_example.yaml
+
+# Output files
+*.json
+*.csv

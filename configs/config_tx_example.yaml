@@ -1,0 +1,206 @@
+# =============================================================================
+# Infrastructure Mapping Tool - TX Datacenter Configuration
+# =============================================================================
+#
+# INSTRUCTIONS:
+#   1. Copy this file: cp config_tx_example.yaml config_tx.yaml
+#   2. Replace all values marked with <REPLACE_...> with your actual values
+#   3. Run: python3 aria_mapping.py --config configs/config_tx.yaml --list-regions
+#   4. Test with --dry-run before executing
+#
+# Author: Noah Farshad (noah@essential.coach)
+# License: MIT
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# ARIA AUTOMATION CONNECTION
+# -----------------------------------------------------------------------------
+aria:
+  host: "vra.tx.essential.coach"              # <REPLACE_VRA_HOST>
+  username: "svc-aria-automation"             # <REPLACE_VRA_USERNAME>
+  password: "ExAmPlE_P@ssw0rd!2026"           # <REPLACE_VRA_PASSWORD>
+  domain: "System Domain"
+  verify_ssl: false
+
+# -----------------------------------------------------------------------------
+# TARGET REGIONS
+# -----------------------------------------------------------------------------
+# CRITICAL: Must match EXACTLY what shows in `--list-regions`
+# Run: python3 aria_mapping.py --config config.yaml --list-regions
+# -----------------------------------------------------------------------------
+regions:
+  - name: "TX-DC01"                           # <REPLACE_REGION_NAME>
+
+# -----------------------------------------------------------------------------
+# FLAVOR PROFILE SETTINGS
+# -----------------------------------------------------------------------------
+# The API creates ONE profile per region containing ALL flavors.
+# Result: 1 profile for TX containing all flavors below.
+# -----------------------------------------------------------------------------
+flavor_profile_name: "essential-flavor-profile"
+flavor_profile_description: "VM sizing options for TX datacenter"
+
+# -----------------------------------------------------------------------------
+# FLAVOR MAPPINGS
+# -----------------------------------------------------------------------------
+flavors:
+  # Small - Development/Test
+  - name: "2cpu-4gb"
+    cpuCount: 2
+    memoryMB: 4096
+    description: "Small - Dev/Test (2 vCPU, 4 GB RAM)"
+  
+  - name: "2cpu-8gb"
+    cpuCount: 2
+    memoryMB: 8192
+    description: "Small - Dev/Test (2 vCPU, 8 GB RAM)"
+  
+  # Medium - General Purpose
+  - name: "4cpu-8gb"
+    cpuCount: 4
+    memoryMB: 8192
+    description: "Medium - General (4 vCPU, 8 GB RAM)"
+  
+  - name: "4cpu-16gb"
+    cpuCount: 4
+    memoryMB: 16384
+    description: "Medium - General (4 vCPU, 16 GB RAM)"
+  
+  - name: "4cpu-32gb"
+    cpuCount: 4
+    memoryMB: 32768
+    description: "Medium - Memory (4 vCPU, 32 GB RAM)"
+  
+  # Large - Production Workloads
+  - name: "8cpu-16gb"
+    cpuCount: 8
+    memoryMB: 16384
+    description: "Large - Compute (8 vCPU, 16 GB RAM)"
+  
+  - name: "8cpu-32gb"
+    cpuCount: 8
+    memoryMB: 32768
+    description: "Large - General (8 vCPU, 32 GB RAM)"
+  
+  - name: "8cpu-64gb"
+    cpuCount: 8
+    memoryMB: 65536
+    description: "Large - Memory (8 vCPU, 64 GB RAM)"
+  
+  # XL - Enterprise/Database
+  - name: "16cpu-32gb"
+    cpuCount: 16
+    memoryMB: 32768
+    description: "XL - Compute (16 vCPU, 32 GB RAM)"
+  
+  - name: "16cpu-64gb"
+    cpuCount: 16
+    memoryMB: 65536
+    description: "XL - General (16 vCPU, 64 GB RAM)"
+  
+  - name: "16cpu-128gb"
+    cpuCount: 16
+    memoryMB: 131072
+    description: "XL - Memory (16 vCPU, 128 GB RAM)"
+
+# -----------------------------------------------------------------------------
+# IMAGE PROFILE SETTINGS
+# -----------------------------------------------------------------------------
+image_profile_name: "essential-image-profile"
+image_profile_description: "VM templates for TX datacenter"
+
+# -----------------------------------------------------------------------------
+# IMAGE MAPPINGS
+# -----------------------------------------------------------------------------
+# Map logical names to actual vCenter template names.
+# Run `--list-images` to see available templates.
+# -----------------------------------------------------------------------------
+images:
+  - name: "rhel9-template"
+    description: "Red Hat Enterprise Linux 9"
+    templates:
+      "TX-DC01": "t-rhel9"                    # <REPLACE_TEMPLATE_NAME>
+  
+  - name: "rhel8-template"
+    description: "Red Hat Enterprise Linux 8"
+    templates:
+      "TX-DC01": "t-rhel8"
+  
+  - name: "win2022-template"
+    description: "Windows Server 2022 with Desktop Experience"
+    templates:
+      "TX-DC01": "T-WIN22G"
+  
+  - name: "win2022-core-template"
+    description: "Windows Server 2022 Core (no GUI)"
+    templates:
+      "TX-DC01": "T-WIN22-CORE"
+  
+  - name: "win2019-template"
+    description: "Windows Server 2019 with Desktop Experience"
+    templates:
+      "TX-DC01": "T-WIN19G"
+
+# -----------------------------------------------------------------------------
+# TAGS CONFIGURATION
+# -----------------------------------------------------------------------------
+# Capability tags control VM placement. The blueprint uses constraints like
+# `tag: location:TX-SDDC` to match resources with these capability tags.
+# -----------------------------------------------------------------------------
+tags:
+  # Cloud Zone capability tags
+  cloud_zones:
+    - name: "TX-W01-vcsa.tx.essential.coach / TX-DC01"  # <REPLACE_CLOUD_ZONE_NAME>
+      tags:
+        - key: "location"
+          value: "TX-SDDC"
+        - key: "network"
+          value: "tx-sddc"
+
+  # Network Profile capability tags
+  network_profiles:
+    - name: "Network-Profile-TX"              # <REPLACE_NETWORK_PROFILE_NAME>
+      tags:
+        - key: "network"
+          value: "tx-sddc"
+
+  # Storage Profile capability tags
+  storage_profiles:
+    - name: "TX-SDDC-Standard"                # <REPLACE_STORAGE_PROFILE_NAME>
+      tags:
+        - key: "location"
+          value: "TX-SDDC"
+    - name: "TX-SDDC-Oracle"
+      compute: "TX-Oracle-Cluster"            # <REPLACE_COMPUTE_NAME>
+      tags:
+        - key: "location"
+          value: "TX-SDDC"
+        - key: "storage"
+          value: "oracle"
+    - name: "TX-SDDC-SQL"
+      compute: "TX-SQL-Cluster"
+      tags:
+        - key: "location"
+          value: "TX-SDDC"
+        - key: "storage"
+          value: "sql"
+
+  # Compute (Cluster) capability tags
+  compute:
+    - name: "TX-Workload-Cluster"             # <REPLACE_CLUSTER_NAME>
+      tags:
+        - key: "cluster"
+          value: "workload"
+    - name: "TX-Oracle-Cluster"
+      tags:
+        - key: "cluster"
+          value: "oracle"
+        - key: "workload"
+          value: "oracle"
+    - name: "TX-SQL-Cluster"
+      tags:
+        - key: "cluster"
+          value: "sql"
+        - key: "workload"
+          value: "sql"
