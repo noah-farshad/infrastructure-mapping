@@ -117,39 +117,79 @@ image_profile_description: "VM templates for TX and VA datacenters"
 # -----------------------------------------------------------------------------
 # IMAGE MAPPINGS
 # -----------------------------------------------------------------------------
-# Map logical names to actual vCenter template names PER REGION.
-# Template names may differ between datacenters.
+# Maps LOGICAL names (used in blueprints) to ACTUAL vCenter template names.
+#
+# STEP 1: Discover available templates
+#   python3 aria_mapping.py --config config.yaml --list-images
+#
+# STEP 2: Example output from --list-images:
+#   ======================================================================
+#   AVAILABLE TEMPLATES (Fabric Images)
+#   ======================================================================
+#   Region: TX-DC01
+#     - t-rhel9 (RHEL 9 Gold Image)
+#     - t-rhel8 (RHEL 8 Gold Image)
+#     - T-WIN22G (Windows Server 2022 GUI)
+#     - T-WIN22-CORE (Windows Server 2022 Core)
+#     - T-WIN19G (Windows Server 2019 GUI)
+#     - ubuntu-22.04-template
+#   Region: VA-DC01
+#     - t-rhel9 (RHEL 9 Gold Image)
+#     - t-rhel8 (RHEL 8 Gold Image)
+#     - T-WIN22G (Windows Server 2022 GUI)
+#     - T-WIN19G (Windows Server 2019 GUI)
+#
+# STEP 3: Map the templates below using EXACT names from --list-images
+#   - "name" = logical name for blueprints (your choice)
+#   - "templates" = actual vCenter template names PER region
+#   - Template names ARE case-sensitive!
+#   - If a template doesn't exist in a region, omit that region
+#
+# STEP 4: Preview and execute
+#   python3 aria_mapping.py --config config.yaml --images --dry-run
+#   python3 aria_mapping.py --config config.yaml --images --execute
 # -----------------------------------------------------------------------------
 images:
-  - name: "rhel9-template"
+  # RHEL 9 - Available in both datacenters
+  - name: "rhel9-template"                    # Logical name for blueprints
     description: "Red Hat Enterprise Linux 9"
     templates:
-      "TX-DC01": "t-rhel9"                    # <REPLACE_TX_TEMPLATE>
-      "VA-DC01": "t-rhel9"                    # <REPLACE_VA_TEMPLATE>
+      "TX-DC01": "t-rhel9"                    # <-- From --list-images output
+      "VA-DC01": "t-rhel9"                    # <-- From --list-images output
   
+  # RHEL 8 - Available in both datacenters
   - name: "rhel8-template"
     description: "Red Hat Enterprise Linux 8"
     templates:
       "TX-DC01": "t-rhel8"
       "VA-DC01": "t-rhel8"
   
+  # Windows Server 2022 GUI - Available in both datacenters
   - name: "win2022-template"
     description: "Windows Server 2022 with Desktop Experience"
     templates:
       "TX-DC01": "T-WIN22G"
       "VA-DC01": "T-WIN22G"
   
+  # Windows Server 2022 Core - TX only (VA doesn't have this template)
   - name: "win2022-core-template"
     description: "Windows Server 2022 Core (no GUI)"
     templates:
       "TX-DC01": "T-WIN22-CORE"
-      "VA-DC01": "T-WIN22-CORE"
+      # VA-DC01 omitted - template not available in VA
   
+  # Windows Server 2019 GUI - Available in both datacenters
   - name: "win2019-template"
     description: "Windows Server 2019 with Desktop Experience"
     templates:
       "TX-DC01": "T-WIN19G"
       "VA-DC01": "T-WIN19G"
+  
+  # Ubuntu 22.04 - TX only example
+  # - name: "ubuntu-2204-template"
+  #   description: "Ubuntu 22.04 LTS Server"
+  #   templates:
+  #     "TX-DC01": "ubuntu-22.04-template"
 
 # -----------------------------------------------------------------------------
 # TAGS CONFIGURATION

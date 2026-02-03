@@ -113,14 +113,27 @@ image_profile_description: "VM templates for TX datacenter"
 # -----------------------------------------------------------------------------
 # IMAGE MAPPINGS
 # -----------------------------------------------------------------------------
-# Map logical names to actual vCenter template names.
-# Run `--list-images` to see available templates.
+# Maps LOGICAL names (used in blueprints) to ACTUAL vCenter template names.
+#
+# WORKFLOW:
+#   1. Run: python3 aria_mapping.py --config config.yaml --list-images
+#   2. Copy the EXACT template names from the output
+#   3. Map them below (template names ARE case-sensitive!)
+#   4. Preview: python3 aria_mapping.py --config config.yaml --images --dry-run
+#   5. Execute: python3 aria_mapping.py --config config.yaml --images --execute
+#
+# Example --list-images output:
+#   Region: TX-DC01
+#     - t-rhel9 (RHEL 9 Gold Image)
+#     - t-rhel8 (RHEL 8 Gold Image)
+#     - T-WIN22G (Windows Server 2022 GUI)
+#     - T-WIN22-CORE (Windows Server 2022 Core)
 # -----------------------------------------------------------------------------
 images:
-  - name: "rhel9-template"
+  - name: "rhel9-template"                    # Logical name for blueprints
     description: "Red Hat Enterprise Linux 9"
     templates:
-      "TX-DC01": "t-rhel9"                    # <REPLACE_TEMPLATE_NAME>
+      "TX-DC01": "t-rhel9"                    # <-- EXACT name from --list-images
   
   - name: "rhel8-template"
     description: "Red Hat Enterprise Linux 8"
